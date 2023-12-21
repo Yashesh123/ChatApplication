@@ -1,0 +1,23 @@
+<nb-layout>
+    <nb-layout-column>  
+        <nb-chat>
+            <ng-template nbChatTitle>
+                <nb-user 
+                    size="large"
+                    name="Group Name"
+                    title="Some Description"
+                ></nb-user>
+            </ng-template>
+            <nb-chat-message 
+                *ngFor="let msg of rd" 
+                [message]="msg.messageString"
+                [sender]="msg.userName" 
+                [date] = "msg.sendTime"
+                [dateFormat]="'medium'"
+                [reply]="msg.myMessage"
+            >
+            </nb-chat-message>
+            <nb-chat-form (send)="sendMessage($event)"></nb-chat-form>
+        </nb-chat>
+    </nb-layout-column>
+</nb-layout>

@@ -1,0 +1,31 @@
+<nb-layout>
+    <nb-layout-column>
+        <div class="login-card">
+            <nb-card >
+                <nb-card-body>
+                    <div class = "container">
+                        <div>Register</div>
+                        <div>Hello! Register With Your Name</div>
+                        <div class="input-fields">
+                            <nb-form-field>
+                                <input nbInput id="name-ip" [(ngModel)]="name" placeholder="Name">
+                            </nb-form-field>
+                            <nb-form-field>
+                                <input [type]="getInputType()" placeholder="Password" nbInput [(ngModel)]="password">
+                            <button nbSuffix nbButton ghost (click)="toggleShowPassword()">
+                                <nb-icon [icon]="showPassword ? 'eye-outline' : 'eye-off-2-outline'"
+                                            pack="eva"
+                                            [attr.aria-label]="showPassword ? 'hide password' : 'show password'">
+                                </nb-icon>
+                            </button>
+                            </nb-form-field>
+                        </div>
+                        <div>
+                            <button nbButton type="submit" (click)="doRegister()">REGISTER</button>
+                        </div>
+                    </div>
+                </nb-card-body>
+            </nb-card>
+        </div>
+    </nb-layout-column>
+</nb-layout>
