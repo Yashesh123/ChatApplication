@@ -2,6 +2,7 @@
 <nb-layout>
     <nb-layout-column>
         <app-nav></app-nav>
-        <app-dashboard></app-dashboard>
+        <app-call *ngIf="showCallComponent"></app-call>
+        <app-dashboard *ngIf="!showCallComponent"></app-dashboard>
     </nb-layout-column>
 </nb-layout>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Observable, catchError, tap, } from 'rxjs';
 import { Message } from 'src/app/models/messageFormat';
 import { DataService } from 'src/app/services/data-service.service';
@@ -16,6 +16,9 @@ export class DashboardComponent implements OnInit {
   inputMessage = ""
   userName = "";
 
+  @ViewChild('remoteVideo')
+  remoteVideo!: ElementRef;
+
   constructor(
       private dataService: DataService
     ){
@@ -26,14 +29,19 @@ export class DashboardComponent implements OnInit {
   
   ngOnInit(): void {
     this.dataService.messageObservable
-      .subscribe((data:Message)=>{
+      .subscribe((data:any)=>{
         console.log(data)
-        data = {
-          ...data,
-          sendTime : new Date(data.sendTime),
-          myMessage: data.userName === this.userName ? true : false
-        };
-        this.rd.push(data);
+        if(data.forCall){
+          this.handleCall(data);
+        } else {
+          data = {
+            ...data,
+            sendTime : new Date(data.sendTime),
+            myMessage: data.userName === this.userName ? true : false
+          };
+          this.rd.push(data);
+        }
+        
       }),
       catchError(error => { throw error}),
       tap({
@@ -44,10 +52,34 @@ export class DashboardComponent implements OnInit {
 
   sendMessage(event:any = undefined){
     this.message = {
+      forCall : false,
       userName : this.userName,
       messageString : event.message
     };
     console.log( this.message)
     this.dataService.sendMessage(this.message)
+  }
+
+  async makeCall(){
+    await this.dataService.makeCall(this.remoteVideo);
+  }
+
+  async handleCall(data:any) : Promise<void>{
+    switch (data.type){
+      case "offer":
+        await this.dataService.handleOffer(data.offer, this.remoteVideo);
+        break;
+
+      case 'answer':
+        await this.dataService.handleAnswer(data.answer);
+        break;
+
+      case 'candidate':
+        this.dataService.handleCandidate(data.candidate);
+        break;
+
+      default:
+        break;
+    }
   }
 }

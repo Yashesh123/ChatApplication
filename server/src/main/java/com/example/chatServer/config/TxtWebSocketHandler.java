@@ -27,23 +27,43 @@ public class TxtWebSocketHandler extends TextWebSocketHandler {
         // Handle incoming messages here
         String receivedMessage = (String) message.getPayload();
         System.out.println(receivedMessage);
+        System.out.println(session);
+
         JSONObject jsonObject = new JSONObject(receivedMessage);
-        // Process the message and send a response if needed
-        System.out.println("here " + jsonObject.get("userName"));
         JSONObject send = new JSONObject();
-        send.put("userName", jsonObject.get("userName"));
-        send.put("messageString", "sent" + jsonObject.get("messageString"));
-        LocalDateTime currentTime = LocalDateTime.now();
-        send.put("sendTime", currentTime.toString());
-        for(WebSocketSession socketSession: sessions){
-            socketSession.sendMessage(new TextMessage((send.toString())));
+        boolean isForCall = jsonObject.getBoolean("forCall");
+
+        if(isForCall) {
+            String type = jsonObject.getString("type");
+            send.put("forCall", true);
+            send.put("type", type);
+            send.put(type, jsonObject.get(type));
+
+            for(WebSocketSession socketSession: sessions){
+                if(!socketSession.getId().equals(session.getId()))
+                    socketSession.sendMessage(new TextMessage((send.toString())));
+            }
+        } else {
+            System.out.println("here " + jsonObject.get("userName"));
+            send.put("forCall", false);
+            send.put("userName", jsonObject.get("userName"));
+            send.put("messageString", "sent" + jsonObject.get("messageString"));
+            LocalDateTime currentTime = LocalDateTime.now();
+            send.put("sendTime", currentTime.toString());
+            callRepository(jsonObject.getString("userName"), jsonObject.getString("messageString"), currentTime);
+
+            for(WebSocketSession socketSession: sessions){
+                socketSession.sendMessage(new TextMessage((send.toString())));
+            }
         }
-        callRepository(jsonObject.getString("userName"), jsonObject.getString("messageString"), currentTime);
+
+
     }
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
     // Perform actions when a new WebSocket connection is established
         System.out.println("after established");
+        System.out.println(session);
         sessions.add(session);
     }
     @Override

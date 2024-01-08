@@ -1,3 +1,4 @@
+import { DataService } from 'src/app/services/data-service.service';
 import { Component } from '@angular/core';
 
 @Component({
@@ -6,5 +7,15 @@ import { Component } from '@angular/core';
   styleUrls: ['./root.component.scss']
 })
 export class RootComponent {
+
+  showCallComponent = false;
+
+  constructor(private dataService: DataService){
+    this.dataService.loadCallComponentObservable$.subscribe(
+      (shouldShowCallComponent) => this.showCallComponent = shouldShowCallComponent
+    )
+  }
+
+
 
 }
